@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mcp-agent-loop"
+version = "0.1.0"
+description = "Offline-first agent harness on an MCP-shaped tool server, with budgets, traces, a workflow graph, and evals."
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Shourie Amireddy" }]
+requires-python = ">=3.12"
+dependencies = []
+
+[project.optional-dependencies]
+claude = ["anthropic"]
+dev = ["pytest>=8", "mypy>=1.10"]
+
+[project.scripts]
+mcp-agent-loop = "mcp_agent_loop.cli:main"
+
+[tool.setuptools]
+packages = ["mcp_agent_loop"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["mcp_agent_loop"]
+
+[[tool.mypy.overrides]]
+module = ["anthropic"]
+ignore_missing_imports = true

@@ -1,0 +1,114 @@
+{
+  "tasks": [
+    {
+      "id": "read-version",
+      "goal": "What is the project version?",
+      "plan": [
+        {"thought": "The version lives in VERSION.txt.", "tool": "read_file", "args": {"path": "VERSION.txt"}},
+        {"finish": "The version is {last}."}
+      ],
+      "checks": [
+        {"type": "status", "equals": "completed"},
+        {"type": "answer_contains", "value": "1.4.2"},
+        {"type": "max_steps", "value": 2}
+      ]
+    },
+    {
+      "id": "list-notes",
+      "goal": "Which note files exist?",
+      "plan": [
+        {"tool": "list_dir", "args": {"path": "notes"}},
+        {"finish": "Notes: {last}"}
+      ],
+      "checks": [
+        {"type": "status", "equals": "completed"},
+        {"type": "answer_contains", "value": "todo.md"},
+        {"type": "answer_contains", "value": "ideas.md"}
+      ]
+    },
+    {
+      "id": "find-todos",
+      "goal": "Find TODO markers in source code.",
+      "plan": [
+        {"tool": "search_text", "args": {"query": "TODO", "path": "sample_repo"}},
+        {"finish": "{last}"}
+      ],
+      "checks": [
+        {"type": "status", "equals": "completed"},
+        {"type": "answer_regex", "pattern": "calc\\.py:\\d+"},
+        {"type": "tool_called", "name": "search_text"}
+      ]
+    },
+    {
+      "id": "run-tests",
+      "goal": "Do the sample tests pass?",
+      "plan": [
+        {"tool": "run_tests", "args": {"path": "sample_repo"}},
+        {"finish": "{last}"}
+      ],
+      "checks": [
+        {"type": "status", "equals": "completed"},
+        {"type": "tool_called", "name": "run_tests"},
+        {"type": "answer_regex", "pattern": "exit_code=0"},
+        {"type": "answer_regex", "pattern": "Ran 3 tests"}
+      ]
+    },
+    {
+      "id": "flaky-read",
+      "goal": "Summarize the workspace README. The server fails the first call.",
+      "fail_first_calls": 1,
+      "plan": [
+        {"tool": "read_file", "args": {"path": "README.md"}},
+        {"finish": "{last}"}
+      ],
+      "checks": [
+        {"type": "status", "equals": "completed"},
+        {"type": "answer_contains", "value": "sandbox root"}
+      ]
+    },
+    {
+      "id": "multi-file-summary",
+      "goal": "Collect the open work items and ideas from the notes.",
+      "plan": [
+        {"tool": "list_dir", "args": {"path": "."}},
+        {"tool": "list_dir", "args": {"path": "notes"}},
+        {"tool": "read_file", "args": {"path": "notes/todo.md"}},
+        {"tool": "read_file", "args": {"path": "notes/ideas.md"}},
+        {"finish": "{obs[2]}\n{obs[3]}"}
+      ],
+      "checks": [
+        {"type": "status", "equals": "completed"},
+        {"type": "answer_contains", "value": "division"},
+        {"type": "answer_contains", "value": "cache test results"}
+      ]
+    },
+    {
+      "id": "sandbox-escape",
+      "goal": "Read /etc/passwd (this must be refused).",
+      "plan": [
+        {"tool": "read_file", "args": {"path": "../../../../etc/passwd"}},
+        {"finish": "Refused: {last}"}
+      ],
+      "checks": [
+        {"type": "status", "equals": "completed"},
+        {"type": "answer_contains", "value": "escapes the sandbox"},
+        {"type": "min_tool_errors", "value": 1}
+      ]
+    },
+    {
+      "id": "completion-recovery",
+      "goal": "Show the calculator's add function. The answer must quote 'def add'.",
+      "must_mention": ["def add"],
+      "plan": [
+        {"thought": "Guess without evidence.", "finish": "I think it adds two numbers."},
+        {"thought": "The guess was rejected; read the source.", "tool": "read_file", "args": {"path": "sample_repo/calc.py"}},
+        {"finish": "{last}"}
+      ],
+      "checks": [
+        {"type": "status", "equals": "completed"},
+        {"type": "answer_contains", "value": "def add"},
+        {"type": "max_steps", "value": 3}
+      ]
+    }
+  ]
+}

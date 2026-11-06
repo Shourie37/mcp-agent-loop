@@ -1,0 +1,18 @@
+{
+  "configs": {
+    "baseline": {
+      "max_steps": 4,
+      "max_seconds": 30,
+      "max_tokens": 20000,
+      "max_retries": 0,
+      "allowed_tools": ["read_file", "list_dir", "search_text"]
+    },
+    "hardened": {
+      "max_steps": 8,
+      "max_seconds": 30,
+      "max_tokens": 20000,
+      "max_retries": 2,
+      "allowed_tools": ["read_file", "list_dir", "search_text", "run_tests"]
+    }
+  }
+}
